@@ -2,21 +2,37 @@ console.time("user");
 var UserModel = require('./model/user.js')
 console.timeEnd("user");       //打印数据库连接的时间
 
+//新增
 var news = new UserModel({
-  name: "   张三   ",
+  name: "小二",
   age: 20,
-  pic: "www.xxx.com/x.png"
+  pic: "www.xxx.com/x.png",
+  sn: 125
 })
 // news.content = 'content'
-news.save((err)=>{
-  if(err){
-    return console.log(err);
-  }
-  UserModel.find({},(err,doc)=>{
-  if(err){
-      return console.log(err);
-    }
-    console.log(doc);
-  })
+// news.save((err)=>{
+//   if(err){
+//     return console.log(err);
+//   }
+//   UserModel.find({},(err,doc)=>{
+//   if(err){
+//       return console.log(err);
+//     }
+//     console.log(doc);
+//   })
 
-})
+// })
+
+
+//调用扩展的静态方法
+// UserModel.findBySn('123',function(err,docs){
+//   if(err){
+//     return console.log(err);
+//   }
+//   console.log(docs);
+// })
+
+
+//调用扩展的实例方法
+news.print();
+
