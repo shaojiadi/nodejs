@@ -4,24 +4,25 @@ console.timeEnd("user");       //打印数据库连接的时间
 
 //新增
 var news = new UserModel({
-  name: "小二",
-  age: 20,
+  name: "小王",
+  age: 66,
   pic: "www.xxx.com/x.png",
-  sn: 125
+  sn: 'sn125',
+  sex: '女'
 })
 // news.content = 'content'
-// news.save((err)=>{
-//   if(err){
-//     return console.log(err);
-//   }
-//   UserModel.find({},(err,doc)=>{
-//   if(err){
-//       return console.log(err);
-//     }
-//     console.log(doc);
-//   })
+news.save((err)=>{
+  if(err){
+    return console.log(err);
+  }
+  UserModel.find({},(err,doc)=>{
+  if(err){
+      return console.log(err);
+    }
+    console.log(doc);
+  })
 
-// })
+})
 
 
 //调用扩展的静态方法
