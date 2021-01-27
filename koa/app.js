@@ -2,11 +2,13 @@
 https://github.com/koajs/router/blob/HEAD/API.md
 */
 var Koa = require('koa'),
+    path = require('path'),
     view = require('koa-views'),
     router = require('koa-router')(), /*引入是实例化路由*/
     common = require('./module/common.js'),
-    bodyParser = require('koa-bodyparser');
-    static = require('koa-static');
+    bodyParser = require('koa-bodyparser'),
+    static = require('koa-static'),
+    render = require('koa-art-template')
 
 /* var Router = require('koa-router');
 var router = new Router(); */
@@ -19,15 +21,22 @@ var app = new Koa();
 /* app.use(view('view',{
   html: 'ejs'      //如果这样配置，模板的后缀名要是.html
 })) */
-app.use(view('view',{
-  extension: 'ejs'      /*应用ejs模板引擎*/
-}))
+/* app.use(view('view',{
+  extension: 'ejs'      //应用ejs模板引擎,后缀名为ejs
+})) */
+
+//配置koa-art-template模板引擎
+render(app,{
+  root: path.join(__dirname,'view'),
+  extname: '.html',      //后缀名
+  debug: process.env.NODE_ENV!='production'        //是否开启调试
+})
+
 
 //http://localhost:3000/css/basic.css 首先去static目录找，如果能找到返回对应文件，找不到next()
 //配置静态web服务中间件
 app.use(static('static'));     //静态web服务中间件可以配置多个
 // app.use(static(__dirname+'/static'));  //同上
-
 
 
 //配置post bodyparser的中间件
@@ -57,14 +66,15 @@ app.use(async(ctx,next)=>{
 
 //路由配置
 router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信息
-    //ctx.body = '首页'            //返回数据  相当于原生里面的res.writeHead() res.end()
-  let title = 'hello!,ejs'
-  let content = '<h2>666</h2>'
-  let num = 123
+  //ctx.body = '首页'            //返回数据  相当于原生里面的res.writeHead() res.end()
+  let list = {
+    name: '张三',
+    content: '<h2>666</h2>',
+    num: 21,
+    data: [1111,2222,3333]
+  }
   await ctx.render('index',{
-    title: title,
-    content: content,
-    num: num
+    list: list
   });
 })
 
@@ -72,11 +82,9 @@ router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信�
 router.get('/news',async(ctx,next)=>{
   //从ctx中读取get传值
   /*
-  query:返回的格式化好的参数
-  querystring: 返回的是请求字符串
+  query:返回的格式化好的参数   console.log(ctx.query);  //获取的是对象，使用最多
+  querystring: 返回的是请求字符串       console.log(ctx.querystring);
   */
-  //  console.log(ctx.query);  //获取的是对象，使用最多
-  //  console.log(ctx.querystring);
   console.log(ctx.url);  //获取url地址             
   //ctx里面的request里面获取get传值
   //  console.log(ctx.request);
@@ -84,8 +92,16 @@ router.get('/news',async(ctx,next)=>{
 })
 
 router.get('/news',async(ctx)=>{
-  //ctx.body = '新闻页'    //返回
+  //ejs数据
   let list = ['1111','2222','3333'];
+  /* let title = 'hello!'
+  let content = '<h2>666</h2>'
+  let num = 123
+  await ctx.render('index',{
+    title: title,
+    content: content,
+    num: num
+  }); */
   await ctx.render('news',{
     list: list
   })
@@ -104,7 +120,6 @@ router.get('/login',async(ctx)=>{
 router.post('/doAdd',async(ctx)=>{            
   //原生node.js 在koa中获取表单提交的数据
   /* var data = await common.getPostData(ctx);
-  console.log(data);
   ctx.body = data; */
   ctx.body = ctx.request.body;   //使用bodyParser获取表单提交的数据
 })
