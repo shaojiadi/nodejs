@@ -8,7 +8,8 @@ var Koa = require('koa'),
     common = require('./module/common.js'),
     bodyParser = require('koa-bodyparser'),
     static = require('koa-static'),
-    render = require('koa-art-template')
+    render = require('koa-art-template'),
+    session  = require('koa-session')
 
 /* var Router = require('koa-router');
 var router = new Router(); */
@@ -31,6 +32,23 @@ render(app,{
   extname: '.html',      //后缀名
   debug: process.env.NODE_ENV!='production'        //是否开启调试
 })
+
+
+//koa-session配置
+app.keys = ['some secret hurr'];  //cookie的签名
+const CONFIG = {
+  key: 'koa.sess', /*默认*/
+  maxAge: 86400000,        //cookie的过期时间  需要设置
+  overwrite: true, //默认
+  httpOnly: true,
+  signed: true, /** 签名(默认) */
+  rolling: true, /** 每次请求时强行设置cookie，这将重置cookie过期时间，默认为false */
+  renew: false, /** (boolean) renew session when session is nearly expired 用户快过期时重新设置*/
+};
+
+app.use(session(CONFIG, app));
+
+
 
 
 //http://localhost:3000/css/basic.css 首先去static目录找，如果能找到返回对应文件，找不到next()
@@ -67,6 +85,18 @@ app.use(async(ctx,next)=>{
 //路由配置
 router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信息
   //ctx.body = '首页'            //返回数据  相当于原生里面的res.writeHead() res.end()
+
+  //默认不能用中文传值
+  var userinfo = Buffer.from('张三').toString('base64');
+  ctx.cookies.set('userinfo',userinfo,{
+    maxAge: 60*1000*60,
+    // path: '/info',       //配置访问的路径
+    // domain: '.baidu.com'        /*正常情况不设置 默认就是当前域名下的所有页面可以访问*/
+    // httpOnly: true,        //true表示这个cookie只有服务器可以访问，false表示客户端(js)、服务器端都可以访问
+  })
+
+  ctx.session.age = 20;
+
   let list = {
     name: '张三',
     content: '<h2>666</h2>',
@@ -77,6 +107,17 @@ router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信�
     list: list
   });
 })
+
+router.get('/info',async(ctx,next)=>{
+  var userinfo = ctx.cookies.get('userinfo');
+  var data = Buffer.from(userinfo,'base64').toString();
+  console.log(data);
+
+  console.log(ctx.session.age);
+
+  ctx.body = "userinfo"
+})
+
 
 
 router.get('/news',async(ctx,next)=>{
