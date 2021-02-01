@@ -125,21 +125,24 @@ router.get('/news',async(ctx,next)=>{
   await next();     //没有返回会404报错，添加路由级中间件继续向下匹配
 })
 
-router.get('/news',async(ctx)=>{
-  //ejs数据
-  let list = ['1111','2222','3333'];
-  /* let title = 'hello!'
-  let content = '<h2>666</h2>'
-  let num = 123
-  await ctx.render('index',{
-    title: title,
-    content: content,
-    num: num
-  }); */
-  await ctx.render('news',{
-    list: list
-  })
+router.get('/add',async(ctx)=>{
+  let data = await Db.insert('user',{"username":"小芳","age":13,"sex":"女","status":1});
+  console.log(data.result);
+  ctx.body='this is new a page'
 })
+
+router.get('/edit',async(ctx)=>{
+  let data = await Db.update('user',{"username":"lisi4"},{"username":"李四"});
+  console.log(data.result);
+  ctx.body='this is new a page'
+})
+
+router.get('/delete',async(ctx)=>{
+  let data = await Db.remove('user',{"username":"李四"});
+  console.log(data.result);
+  ctx.body='this is new a page'
+})
+
 
 router.get('/newscontent/:aid/:cid',async(ctx)=>{             //http://localhost:8000/newscontent/132/789
   //获取动态路由的返回值
@@ -152,9 +155,6 @@ router.get('/login',async(ctx)=>{
 })
 
 router.post('/doAdd',async(ctx)=>{            
-  //原生node.js 在koa中获取表单提交的数据
-  /* var data = await common.getPostData(ctx);
-  ctx.body = data; */
   ctx.body = ctx.request.body;   //使用bodyParser获取表单提交的数据
 })
 
