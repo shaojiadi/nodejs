@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+    {{list.name}}
+    <h2>绑定html</h2>
+    {{@list.content}}
+    <h2>条件判断</h2>
+    {{if list.num>20}}大于20{{else}}小于20{{/if}}
+    <h2>循环数据</h2>
+    <ul>
+      {{each list.data}}
+        <li>{{$index}}---{{$value}}</li>
+      {{/each}}
+    </ul>
+    <h2>引入资源</h2>
+    {{include('public/header.html')}}
+</body>
+</html>
