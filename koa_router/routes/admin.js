@@ -1,22 +1,15 @@
-const router = require('koa-router')();
+const router = require('koa-router')(),
+user = require('./admin/user'),
+focus = require('./admin/focus'),
+newscate = require('./admin/newscate')
 
-//配置路由
+//配置路由admin子路由
 router.get('/',(ctx)=>{
   ctx.body = '后台管理系统首页'
 })
 
-
-router.get('/user',(ctx)=>{
-  ctx.body = '用户管理'
-})
-
-router.get('/focus',(ctx)=>{
-  ctx.body = '轮播图管理'
-})
-
-
-router.get('/news',(ctx)=>{
-  ctx.body = '新闻管理'
-})
+router.use('/user',user)
+router.use('/focus',focus)
+router.use('/newscate',newscate)
 
 module.exports = router.routes();
