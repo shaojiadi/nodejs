@@ -1,6 +1,3 @@
-/*
-https://github.com/koajs/router/blob/HEAD/API.md
-*/
 var Koa = require('koa'),
     path = require('path'),
     view = require('koa-views'),
@@ -50,18 +47,6 @@ app.use(static('static'));     //静态web服务中间件可以配置多个
 app.use(bodyParser());
 
 
-//中间件
-/* 
-koa中间件： 匹配路由之前或者匹配路由完成做的一系列的操作称为中间件 
-中间件功能：
-  1.执行任何代码
-  2.修改请求和响应对象
-  3.终结请求-响应循环
-  4.调用堆栈中下一个中间件
-
-如果get\post回调函数中，没有next参数，就匹配第一个路由，就不会往下匹配。如果需要往下匹配，需要些next()
-*/
-
 //匹配任何路由(应用级中间件)
 app.use(async(ctx,next)=>{
   console.log(new Date());
@@ -71,29 +56,15 @@ app.use(async(ctx,next)=>{
 
 
 //显示学员信息
-router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信息
-  //ctx.body = '首页'            //返回数据  相当于原生里面的res.writeHead() res.end()
+router.get('/',async(ctx)=>{    
   var result = await Db.find('user',{});
   await ctx.render('index',{
     list: result
   })
-
-  //默认不能用中文传值
-  var userinfo = Buffer.from('张三').toString('base64');
-  ctx.cookies.set('userinfo',userinfo,{
-    maxAge: 60*1000*60,
-    // path: '/info',       //配置访问的路径
-    // domain: '.baidu.com'        /*正常情况不设置 默认就是当前域名下的所有页面可以访问*/
-    // httpOnly: true,        //true表示这个cookie只有服务器可以访问，false表示客户端(js)、服务器端都可以访问
-
-  })
-
-  ctx.session.age = 20;
 })
 
 //增加学员
 router.get('/add',async(ctx)=>{
-  // let data = await Db.insert('user',{"username":"小芳","age":13,"sex":"女","status":1});
   await ctx.render('add');
 })
 
@@ -118,10 +89,6 @@ router.post('/doAdd',async(ctx)=>{
 
 //编辑学员
 router.get('/edit',async(ctx)=>{
-/*   let data = await Db.update('user',{"username":"lisi4"},{"username":"李四"});
-  console.log(data.result);
-  ctx.body='this is new a page' */
-
   //通过get传过来的id获取用户信息
   let id = ctx.query.id;
   let data = await Db.find('user',{"_id":Db.getObjectId(id)})
@@ -170,34 +137,6 @@ router.get('/delete',async(ctx)=>{
     return;
     ctx.redirect('/add')
   }
-})
-
-
-
-router.get('/info',async(ctx,next)=>{
-  var userinfo = ctx.cookies.get('userinfo');
-  var data = Buffer.from(userinfo,'base64').toString();
-  console.log(data);
-
-  console.log(ctx.session.age);
-
-  ctx.body = "userinfo"
-})
-
-
-
-router.get('/newscontent/:aid/:cid',async(ctx)=>{             //http://localhost:8000/newscontent/132/789
-  //获取动态路由的返回值
-  console.log(ctx.params); 
-  ctx.body = '新闻详情'     
-})
-
-router.get('/login',async(ctx)=>{            
-  await ctx.render('login')
-})
-
-router.post('/doAdd',async(ctx)=>{            
-  ctx.body = ctx.request.body;   //使用bodyParser获取表单提交的数据
 })
 
 //错误级中间件

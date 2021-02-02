@@ -19,6 +19,7 @@
     "koa-views": "^7.0.0"
   },
   "devDependencies": {
+    "koa-generator": "^1.1.17",
     "koa-session": "^6.1.0",
     "mongodb": "^3.6.3"
   }
