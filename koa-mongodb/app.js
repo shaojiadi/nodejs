@@ -70,14 +70,13 @@ app.use(async(ctx,next)=>{
 })  
 
 
-
-//路由配置
+//显示学员信息
 router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信息
   //ctx.body = '首页'            //返回数据  相当于原生里面的res.writeHead() res.end()
-  console.time('start');
   var result = await Db.find('user',{});
-  console.timeEnd('start');
-  console.log(result);
+  await ctx.render('index',{
+    list: result
+  })
 
   //默认不能用中文传值
   var userinfo = Buffer.from('张三').toString('base64');
@@ -86,20 +85,94 @@ router.get('/',async(ctx)=>{    //ctx上下文，包含request和response等信�
     // path: '/info',       //配置访问的路径
     // domain: '.baidu.com'        /*正常情况不设置 默认就是当前域名下的所有页面可以访问*/
     // httpOnly: true,        //true表示这个cookie只有服务器可以访问，false表示客户端(js)、服务器端都可以访问
+
   })
 
   ctx.session.age = 20;
+})
 
-  let list = {
-    name: '张三',
-    content: '<h2>666</h2>',
-    num: 21,
-    data: [1111,2222,3333]
+//增加学员
+router.get('/add',async(ctx)=>{
+  // let data = await Db.insert('user',{"username":"小芳","age":13,"sex":"女","status":1});
+  await ctx.render('add');
+})
+
+//执行增加学员的操作
+router.post('/doAdd',async(ctx)=>{
+  //获取表单提交的数据
+  //console.log(ctx.request.body);
+
+  let data = await Db.insert('user',ctx.request.body);
+  try {
+    if(data.result.ok){
+      ctx.redirect('./')
+    }
+  }catch(err){
+    console.log(err);
+    return;
+    ctx.redirect('/add')
   }
-  await ctx.render('index',{
-    list: list
+  
+})
+
+
+//编辑学员
+router.get('/edit',async(ctx)=>{
+/*   let data = await Db.update('user',{"username":"lisi4"},{"username":"李四"});
+  console.log(data.result);
+  ctx.body='this is new a page' */
+
+  //通过get传过来的id获取用户信息
+  let id = ctx.query.id;
+  let data = await Db.find('user',{"_id":Db.getObjectId(id)})
+ 
+  await ctx.render('edit',{
+    list: data[0]
   });
 })
+
+router.post('/doEdit',async(ctx)=>{
+  let id = ctx.request.body.id;
+  let username = ctx.request.body.username;
+  let age = ctx.request.body.age;
+  let sex = ctx.request.body.sex;
+  let  data = await Db.update('user',{"_id":Db.getObjectId(id)},{
+    username,
+    age,
+    sex
+  })
+  console.log(data);
+
+  try {
+    if(data.result.ok){
+      ctx.redirect('./')
+    }
+  }catch(err){
+    console.log(err);
+    return;
+    ctx.redirect('/add')
+  }
+  
+})
+
+
+//删除学员
+router.get('/delete',async(ctx)=>{
+  let id = ctx.query.id;
+  let data = await Db.delete('user',{"_id":Db.getObjectId(id)});
+  console.log(data);
+  try {
+    if(data.result.ok){
+      ctx.redirect('./')
+    }
+  }catch(err){
+    console.log(err);
+    return;
+    ctx.redirect('/add')
+  }
+})
+
+
 
 router.get('/info',async(ctx,next)=>{
   var userinfo = ctx.cookies.get('userinfo');
@@ -111,37 +184,6 @@ router.get('/info',async(ctx,next)=>{
   ctx.body = "userinfo"
 })
 
-
-
-router.get('/news',async(ctx,next)=>{
-  //从ctx中读取get传值
-  /*
-  query:返回的格式化好的参数   console.log(ctx.query);  //获取的是对象，使用最多
-  querystring: 返回的是请求字符串       console.log(ctx.querystring);
-  */
-  console.log(ctx.url);  //获取url地址             
-  //ctx里面的request里面获取get传值
-  //  console.log(ctx.request);
-  await next();     //没有返回会404报错，添加路由级中间件继续向下匹配
-})
-
-router.get('/add',async(ctx)=>{
-  let data = await Db.insert('user',{"username":"小芳","age":13,"sex":"女","status":1});
-  console.log(data.result);
-  ctx.body='this is new a page'
-})
-
-router.get('/edit',async(ctx)=>{
-  let data = await Db.update('user',{"username":"lisi4"},{"username":"李四"});
-  console.log(data.result);
-  ctx.body='this is new a page'
-})
-
-router.get('/delete',async(ctx)=>{
-  let data = await Db.remove('user',{"username":"李四"});
-  console.log(data.result);
-  ctx.body='this is new a page'
-})
 
 
 router.get('/newscontent/:aid/:cid',async(ctx)=>{             //http://localhost:8000/newscontent/132/789

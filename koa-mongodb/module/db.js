@@ -1,6 +1,7 @@
 //db数据库
 
 var {MongoClient} = require('mongodb');
+var {ObjectID} = require('mongodb');       //db库封装的ObjectID
 var Config = require('./config.js');
 this.dbClient
 class Db {
@@ -75,7 +76,7 @@ class Db {
     })
   }
 
-  remove(collectionName,json){
+  delete(collectionName,json){
     return new Promise((resolve,reject)=>{
       this.connect().then((db)=>{
         db.collection(collectionName).removeOne(json,(err,result)=>{
@@ -88,6 +89,10 @@ class Db {
       })
     })
   }
+
+  getObjectId(id){   //mongoDb里面查询_id把字符串抓换成对象
+    return new ObjectID(id)
+  } 
 
 }
 

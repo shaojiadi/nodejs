@@ -4,20 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .class {
+      border: 1px solid #000;
+      margin-top: 20px;
+    }
+    th {
+      width: 100px;
+    }
+    th,td {
+      border: 1px solid #000;
+      text-align: center;
+    }
+    td a:first-child {
+      margin-right:20px;
+    }
+  </style>
 </head>
 <body>
-    {{list.name}}
-    <h2>绑定html</h2>
-    {{@list.content}}
-    <h2>条件判断</h2>
-    {{if list.num>20}}大于20{{else}}小于20{{/if}}
-    <h2>循环数据</h2>
-    <ul>
-      {{each list.data}}
-        <li>{{$index}}---{{$value}}</li>
+  <a href="./add">增加用户</a>
+  </br>
+    <table class="class">
+      <tr>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>性别</th>
+        <th>操作</th>
+      </tr>
+      {{each list}}
+      <tr>
+        <td>{{$value.username}}</td>
+        <td>{{$value.age}}</td>
+        <td>{{$value.sex}}</td>
+        <td><a href="/edit?id={{@$value._id}}">编辑</a><a href="/delete?id={{@$value._id}}">删除</a></td>     <!--@解析html--> 
+      </tr>
       {{/each}}
-    </ul>
-    <h2>引入资源</h2>
-    {{include('public/header.html')}}
+    </table>
 </body>
 </html>
