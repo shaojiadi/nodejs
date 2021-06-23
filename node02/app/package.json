@@ -16,6 +16,7 @@
   "devDependencies": {
     "@koa/router": "^10.0.0",
     "koa-body": "^4.2.0",
-    "koa-static-cache": "^5.1.4"
+    "koa-static-cache": "^5.1.4",
+    "nunjucks": "^3.2.3"
   }
 }

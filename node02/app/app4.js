@@ -2,6 +2,11 @@ const Koa = require('koa');
 const koaStaticCache = require('koa-static-cache')     //处理静态资源
 const Router = require('@koa/router'); //处理动态资源
 const koaBody = require('koa-body');
+const nunjucks = require('nunjucks');
+const fs = require('fs');
+
+/* let str = nunjucks.renderString('<h1>{{username}}<h1>',{username:'zMouse'})
+console.log(str); */
 
 let maxUserId = 2;
 let users = [
@@ -28,52 +33,18 @@ router.get('/',async(ctx,next)=>{
 })
 
 router.get('/users', async(ctx,next)=>{    
-  let str = users.map(user => {
+/*   let str = users.map(user => {
       return `
           <li>${user.username}</li>
       `
-  }).join(''); 
-  ctx.body = `
-    <!doctype html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Document</title>
-    </head>
-    <body>
-      <ul>
-        ${str}
-      </ul>
-    </body>
-    </html>
-  `;
+  }).join('');  */
+  // ctx.body = nunjucks.renderString(fs.readFileSync('./template/users.html').toString(),{str});
+  ctx.body = nunjucks.renderString(fs.readFileSync('./template/users.html').toString(),{users});
 })
 
 
 router.get('/add',async(ctx,next)=>{
-  ctx.body = `
-  <!doctype html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport"
-            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>Document</title>
-  </head>
-  <body>
-    <form action="/add" method="post">
-      <p>
-        用户名：<input type="text" name="username">
-      </p>
-      <p><button>提交</button></p>
-    </form>
-  </body>
-  </html>
-  `
+  ctx.body = nunjucks.renderString(fs.readFileSync('./template/add.html').toString(),{});
 })
 //默认情况下，koaBody中间件会解析提交过来的正文数据，并把解析后的数据转成对象存储到ctx.request.body属性中
 router.post('/add',koaBody(),async(ctx,next)=>{      //https://www.npmjs.com/package/koa-body
