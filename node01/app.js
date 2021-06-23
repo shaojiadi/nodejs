@@ -23,9 +23,9 @@ routesMap.set('/',async(req,res)=>{
     }).join('')}
   </ul>
   `); */
-  let tpl = fs.readFileSync('./template/index.html').toString();
-  let content = nunjucks.renderString(tpl,{
-    users
+  let tpl = fs.readFileSync('./template/index.html').toString();     //如果是文档类型需要 fs.readFileSync(`.${urlObj.pathname}`).toString()
+  let content = nunjucks.renderString(tpl,{       //nunjucks模板解析器与ejs相同
+    users       
   })
   res.end(content)
 })
@@ -63,7 +63,7 @@ http.createServer(async(req, res)=>{
           break;
       }
 
-      let content = fs.readFileSync(`.${urlObj.pathname}`);     //如果是文档类型需要 fs.readFileSync(`.${urlObj.pathname}`).toString()
+      let content = fs.readFileSync(`.${urlObj.pathname}`);    
       res.end(content);
     }catch(e){
       res.statusCode = 404;
